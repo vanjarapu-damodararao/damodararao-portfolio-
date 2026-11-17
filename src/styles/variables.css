@@ -1,0 +1,30 @@
+/* =========================================================
+   DESIGN TOKENS: change colours, fonts and spacing here
+   and they update across the whole site.
+   ========================================================= */
+:root {
+  /* Paper & ink palette */
+  --paper: #ece7dc;      /* main background */
+  --paper-2: #e2dccf;    /* alternate panels */
+  --paper-hi: #f4f0e7;   /* lightest paper (work section) */
+  --ink: #16181d;        /* text & line work */
+  --graphite: #5c6068;   /* secondary text (passes WCAG AA on paper) */
+  --line: rgba(22, 24, 29, 0.14); /* hairlines, grid */
+  --survey: #ff4f1a;     /* accent: markings, active states only */
+  --survey-deep: #b8360b;/* darker accent for small text (better contrast) */
+  --blueprint: #1b2a4a;  /* the one dark section (experiments) */
+
+  /* Type */
+  --display: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Layout */
+  --gutter: clamp(16px, 4vw, 56px);
+  --max: 1440px;
+  --nav-h: 68px;
+  --section-pad: clamp(80px, 12vw, 160px);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+}

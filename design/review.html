@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design Review: The Drawing Set</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECE7DC;--paper-2:#E2DCCF;--paper-hi:#F4F0E7;--ink:#16181D;--graphite:#5C6068;
+  --line:rgba(22,24,29,.14);--survey:#FF4F1A;--survey-deep:#B8360B;--blueprint:#1B2A4A;
+  --display:"Archivo",system-ui,sans-serif;--serif:"Instrument Serif",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,monospace;
+  --g:clamp(16px,4vw,56px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:17px/1.6 var(--display);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1440px;margin:0 auto;padding:0 var(--g)}
+.serif{font-family:var(--serif);font-style:italic;font-weight:400}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+a{color:inherit}
+
+/* title block */
+.tb{border-bottom:1.5px solid var(--ink);padding:40px 0 28px}
+.tb-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border:1.5px solid var(--ink)}
+.tb-grid>div{padding:12px 16px;border-left:1px solid var(--ink)}.tb-grid>div:first-child{border-left:0}
+.tb-grid small{display:block;color:var(--graphite)}
+h1{font-stretch:118%;font-weight:800;font-size:clamp(40px,7vw,104px);line-height:.95;text-transform:uppercase;letter-spacing:-.01em;margin:36px 0 18px}
+h1 .serif{text-transform:none;font-size:1.05em}
+.lede{max-width:760px;font-size:20px}
+
+/* phase sections */
+.phase{padding:clamp(56px,8vw,112px) 0;border-bottom:1px solid var(--line)}
+.ph-head{display:grid;grid-template-columns:140px 1fr;gap:24px;margin-bottom:40px;align-items:baseline}
+.ph-head .mono{color:var(--survey-deep)}
+h2{font-stretch:112%;font-weight:750;font-size:clamp(28px,4vw,52px);line-height:1.05}
+h2 .serif{font-weight:400}
+h3{font-size:19px;font-weight:700;margin-bottom:8px}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{border:1px solid var(--ink);background:var(--paper-hi);padding:22px}
+.card p{color:#2c2f35}
+.plain{background:var(--ink);color:var(--paper);padding:3px 8px;font-size:13px;font-weight:600;display:inline-block;margin-bottom:12px}
+.note{font-size:15px;color:var(--graphite)}
+
+/* scorecard */
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:700;border-bottom:1.5px solid var(--ink)}
+td.v{white-space:nowrap;font-weight:700}
+.y{color:#2c6b3a}.p{color:var(--survey-deep)}.n{color:#a3261b}
+
+/* storyboard */
+.story{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
+.frame{border:1px solid var(--ink);background:var(--paper-hi);position:relative}
+.frame svg{display:block;width:100%;height:auto}
+.frame figcaption{border-top:1px solid var(--ink);padding:12px 14px;font-size:14px}
+.frame figcaption b{display:block;font-size:15px}
+.frame .num{position:absolute;top:10px;left:12px}
+
+/* design system */
+.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.chip{border:1px solid var(--ink)}
+.chip i{display:block;height:110px;border-bottom:1px solid var(--ink)}
+.chip div{padding:12px 14px;font-size:14px}
+.chip b{display:block;font-size:15px}
+.ratio{display:flex;height:22px;border:1px solid var(--ink);margin-top:20px}
+.ratio span{display:block;height:100%}
+.type{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px}
+.spec{border-top:1.5px solid var(--ink);padding-top:16px}
+.spec .big{font-stretch:125%;font-weight:850;font-size:clamp(48px,7vw,96px);line-height:.9;text-transform:uppercase}
+.spec .sbig{font-family:var(--serif);font-style:italic;font-size:clamp(48px,7vw,96px);line-height:.95}
+.scale{display:flex;align-items:flex-end;gap:10px;margin-top:20px}
+.scale div{background:var(--ink);width:28px}
+.scale small{display:block;font-size:11px;text-align:center;margin-top:6px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.rules li{list-style:none;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+
+/* portrait */
+.port{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:28px;align-items:start}
+.port figure img{width:100%;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--ink);display:block}
+.port figure.t .ph{position:relative;overflow:hidden;aspect-ratio:4/5;border:1px solid var(--ink);background:var(--paper-hi)}
+.port figure.t img{border:0;height:100%;transform:scale(1.06);object-position:50% 30%;filter:grayscale(1) contrast(1.08) brightness(1.04);mix-blend-mode:multiply}
+.port figcaption{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--graphite);margin-top:10px}
+
+/* viewer */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.tabs button{font:600 14px var(--display);border:1px solid var(--ink);background:transparent;color:var(--ink);padding:8px 12px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.tabs button:hover{border-color:var(--survey)}
+.viewer{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start}
+.dev{border:1.5px solid var(--ink);background:#fff;position:relative;overflow:hidden}
+.dev .bar{height:28px;border-bottom:1px solid var(--ink);background:var(--paper-2);display:flex;align-items:center;gap:6px;padding:0 10px}
+.dev .bar i{width:9px;height:9px;border-radius:50%;border:1px solid var(--ink)}
+.dev .bar span{margin-left:10px;font:11px var(--mono);color:var(--graphite)}
+.dev .screen{position:relative;overflow:hidden}
+.dev iframe{border:0;transform-origin:0 0;position:absolute;top:0;left:0;background:var(--paper)}
+.phone{border-radius:28px;border-width:6px}
+.phone .bar{display:none}
+.vlabel{margin-top:10px;display:flex;justify-content:space-between}
+.why{margin-top:28px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.why .card h3 .mono{color:var(--survey-deep);margin-right:8px}
+
+/* review */
+.checks li{list-style:none;display:grid;grid-template-columns:120px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.tag{font:600 12px var(--mono);text-transform:uppercase;padding:3px 8px;border:1px solid currentColor;align-self:start;text-align:center}
+
+/* recommendation */
+.rec{background:var(--ink);color:var(--paper)}
+.rec .ph-head .mono{color:var(--survey)}
+.rec ol{margin-left:22px}.rec li{margin:10px 0}
+.rec .card{background:transparent;border-color:rgba(236,231,220,.35)}
+.rec .card p{color:var(--paper)}
+
+@media (max-width:1000px){
+  .cols,.rules{grid-template-columns:1fr 1fr}
+  .story{grid-template-columns:1fr 1fr}
+  .viewer{grid-template-columns:1fr}
+  .phonewrap{max-width:300px}
+  .port{grid-template-columns:1fr 1fr}.port .txt{grid-column:1/-1}
+}
+@media (max-width:640px){
+  .tb-grid{grid-template-columns:1fr 1fr}.tb-grid>div:nth-child(3){border-left:0}
+  .tb-grid>div:nth-child(n+3){border-top:1px solid var(--ink)}
+  .ph-head{grid-template-columns:1fr;gap:6px}
+  .cols,.rules,.sw,.type,.why{grid-template-columns:1fr}
+  .sw{grid-template-columns:1fr 1fr}
+  .story{grid-template-columns:1fr}
+  .checks li{grid-template-columns:1fr;gap:6px}
+  th:nth-child(3),td:nth-child(3){display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap tb">
+  <div class="tb-grid mono">
+    <div><small>Project</small>Damodara Rao · Portfolio</div>
+    <div><small>Sheet</small>Design review</div>
+    <div><small>Concept</small>A · The Drawing Set</div>
+    <div><small>Status</small>For your approval</div>
+  </div>
+  <h1>Design review, <span class="serif">before we build.</span></h1>
+  <p class="lede">This page is the design file. You don't need Figma. Everything here is the real design in a browser: the colours, the type, how each section looks on desktop and on a phone, and my honest review of the 3D hero. Read it top to bottom. The last section is my recommendation.</p>
+</header>
+
+<!-- ============ PHASE 1 ============ -->
+<section class="phase wrap" id="p1">
+  <div class="ph-head"><p class="mono">Phase 01</p><h2>Creative direction: <span class="serif">kept, sharpened.</span></h2></div>
+  <div class="cols">
+    <div class="card"><span class="plain">The idea in one line</span>
+      <h3>A website is drawn like a building.</h3>
+      <p>Architects draw a building on paper before it's built. You build websites in layers the same way. So the whole portfolio looks like a set of technical drawings: paper, ink lines, measurements, and one orange "marker" colour.</p></div>
+    <div class="card"><span class="plain">Why it works for you</span>
+      <h3>It's about how you think.</h3>
+      <p>Most developer portfolios are dark, neon and full of cards. A paper-and-ink drawing set looks careful and planned. That's exactly what a client or recruiter wants to see in someone who builds their website.</p></div>
+    <div class="card"><span class="plain">What I changed</span>
+      <h3>Clearer words, real you.</h3>
+      <p>I kept the look. I changed the <b>meaning</b> where it was too "architect-y": plain web words instead of building jargon in the hero, your real photo, and wording that matches your real experience (React, Laravel, 2+ years).</p></div>
+  </div>
+</section>
+
+<!-- ============ PHASE 2 ============ -->
+<section class="phase wrap" id="p2">
+  <div class="ph-head"><p class="mono">Phase 02</p><h2>The 3D hero: <span class="serif">an honest review.</span></h2></div>
+  <p class="lede" style="margin-bottom:28px">The current hero shows a building with four floors called Structure, Skin, Systems and Fit-out. It looks good. But looking good isn't enough, so I checked it against your six questions.</p>
+  <table>
+    <thead><tr><th>Your question</th><th>Current building</th><th>Why</th><th>Improved version</th></tr></thead>
+    <tbody>
+      <tr><td>1. Will visitors connect it to web development?</td><td class="v p">Partly</td><td>You see a building first. Only the small labels say "web".</td><td class="v y">Yes</td></tr>
+      <tr><td>2. Does it say "I build websites"?</td><td class="v n">Weakly</td><td>Nothing on screen looks like a website.</td><td class="v y">Yes</td></tr>
+      <tr><td>3. Technical <i>and</i> creative?</td><td class="v y">Yes</td><td>The layers show the technical side and the drawing style shows the creative side.</td><td class="v y">Yes</td></tr>
+      <tr><td>4. Will recruiters get it?</td><td class="v n">Not quickly</td><td>"Skin" and "Fit-out" are architect words that recruiters won't know.</td><td class="v y">Yes</td></tr>
+      <tr><td>5. Impressive but not distracting?</td><td class="v y">Yes</td><td>Thin ink lines, one accent colour, and it sits behind your name.</td><td class="v y">Yes</td></tr>
+      <tr><td>6. Memorable first impression?</td><td class="v y">Yes</td><td>It's unusual, and you can drag it and assemble it by scrolling.</td><td class="v y">Stronger</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card" style="margin-top:32px">
+    <span class="plain">Verdict</span>
+    <h3>Keep the concept. Fix the meaning: <span class="serif" style="font-weight:400">"From blueprint to browser."</span></h3>
+    <p>The exploded-layers idea is strong, so I'm not replacing it with a new object. The problem is that the finished thing looks like a building, not a website. The fix: each floor is shaped like a web page and shows what that layer really does. When you scroll, the floors close together, a browser window lands on top, and the page goes <b>live</b>. In 3 seconds a visitor understands: <i>this person takes a website from plan to launch.</i></p>
+  </div>
+
+  <div class="story" id="story"></div>
+  <p class="note" style="margin-top:14px">Storyboard: what the visitor sees from first load to the end of the hero scroll. These are design drawings. I'll build it in 3D with Three.js after you approve.</p>
+</section>
+
+<!-- ============ PHASE 3 ============ -->
+<section class="phase wrap" id="p3">
+  <div class="ph-head"><p class="mono">Phase 03</p><h2>Design system: <span class="serif">the rules every page follows.</span></h2></div>
+
+  <div class="sw">
+    <div class="chip"><i style="background:#ECE7DC"></i><div><b>Paper</b>#ECE7DC · backgrounds. A warm off-white that's softer on the eyes than pure white.</div></div>
+    <div class="chip"><i style="background:#16181D"></i><div><b>Ink</b>#16181D · text and lines. Almost black, so it doesn't look harsh.</div></div>
+    <div class="chip"><i style="background:#5C6068"></i><div><b>Graphite</b>#5C6068 · secondary text. Dark enough to be readable (passes accessibility).</div></div>
+    <div class="chip"><i style="background:#FF4F1A"></i><div><b>Survey orange</b>#FF4F1A · only for markers, active states and "live". If it's used everywhere, it stops meaning anything.</div></div>
+  </div>
+  <div class="ratio" aria-label="Colour proportions"><span style="flex:70;background:#ECE7DC"></span><span style="flex:20;background:#16181D"></span><span style="flex:7;background:#1B2A4A"></span><span style="flex:3;background:#FF4F1A"></span></div>
+  <p class="note" style="margin-top:8px">How much of each colour: 70% paper · 20% ink · 7% blueprint navy (only the Experiments section) · 3% orange. Keeping orange rare is what makes the design feel premium.</p>
+
+  <div class="type">
+    <div class="spec"><p class="mono">Archivo · headings and UI</p><p class="big">Build</p><p class="note">A wide, strong, slightly technical typeface, like the lettering on engineering drawings. It's used big and in capitals for headings, and normal for body text.</p></div>
+    <div class="spec"><p class="mono">Instrument Serif italic · editorial accents</p><p class="sbig">beyond the ordinary.</p><p class="note">A thin, elegant italic. Used for only a few words per heading, like a designer's handwritten note on a drawing. That contrast is what makes it feel "designed".</p></div>
+  </div>
+  <div class="type" style="margin-top:28px">
+    <div class="spec"><p class="mono">Type scale (desktop → mobile)</p>
+      <table style="margin-top:8px"><tbody>
+        <tr><td>Your name (hero)</td><td>fills the page width</td></tr>
+        <tr><td>Section heading</td><td>72px → 40px</td></tr>
+        <tr><td>Card title</td><td>22px → 19px</td></tr>
+        <tr><td>Body text</td><td>17px (never smaller than 16 on phones)</td></tr>
+        <tr><td>Labels / metadata</td><td>JetBrains Mono 12px, capitals</td></tr>
+      </tbody></table></div>
+    <div class="spec"><p class="mono">Spacing scale (8px steps)</p>
+      <div class="scale">
+        <div><div style="height:8px"></div><small>8</small></div><div><div style="height:16px"></div><small>16</small></div>
+        <div><div style="height:24px"></div><small>24</small></div><div><div style="height:40px"></div><small>40</small></div>
+        <div><div style="height:64px"></div><small>64</small></div><div><div style="height:96px"></div><small>96</small></div>
+        <div><div style="height:160px"></div><small>160</small></div>
+      </div>
+      <p class="note" style="margin-top:12px">Every gap uses one of these numbers. Sections are separated by 160px on desktop and 80px on phones. Lots of empty paper makes a page look expensive.</p></div>
+  </div>
+
+  <ul class="rules">
+    <li><b>Grid</b> 12 columns on desktop, 1 on phones. Content max 1440px wide, side margins 16–56px.</li>
+    <li><b>Lines</b> 1px hairlines for structure, 1.5px for emphasis. No shadows and no rounded cards, because drawings don't have them.</li>
+    <li><b>Breakpoints</b> Desktop over 1100 · Tablet 861–1100 · Phone up to 860 (small phones up to 420).</li>
+    <li><b>Motion</b> Things slide in once as you scroll, and lines "draw" themselves. Nothing loops forever except the hero.</li>
+    <li><b>Easing</b> Fast start, gentle stop (like a pen stroke). Animations last 0.9–1.4 seconds.</li>
+    <li><b>Accessibility</b> If a visitor turns on "reduce motion", every animation switches off. The 3D has a static drawing fallback.</li>
+  </ul>
+</section>
+
+<!-- ============ PHASE 4 ============ -->
+<section class="phase wrap" id="p4">
+  <div class="ph-head"><p class="mono">Phase 04</p><h2>The actual screens: <span class="serif">desktop and phone.</span></h2></div>
+  <p class="lede" style="margin-bottom:24px">These are the live pages, not pictures. Pick a section. Both frames jump to it, and you can scroll and click inside them. Underneath, I explain the design decisions for that section in plain English.</p>
+  <div class="tabs" id="tabs" role="toolbar" aria-label="Choose a section"></div>
+  <div class="viewer">
+    <div>
+      <div class="dev" id="dDesk"><div class="bar"><i></i><i></i><i></i><span>damodararao.dev · desktop 1440px</span></div><div class="screen"><iframe id="fDesk" title="Desktop preview" src="/" width="1440" height="900"></iframe></div></div>
+      <p class="vlabel mono"><span>Desktop</span><span>scaled to fit</span></p>
+    </div>
+    <div class="phonewrap">
+      <div class="dev phone" id="dPhone"><div class="screen"><iframe id="fPhone" title="Phone preview" src="/" width="390" height="780"></iframe></div></div>
+      <p class="vlabel mono"><span>Phone</span><span>390px</span></p>
+    </div>
+  </div>
+  <div class="why" id="why"></div>
+</section>
+
+<!-- ============ PHASE 5 ============ -->
+<section class="phase wrap" id="p5">
+  <div class="ph-head"><p class="mono">Phase 05</p><h2>Your portrait: <span class="serif">printed into the drawing.</span></h2></div>
+  <div class="port">
+    <figure><img src="/images/portrait.jpg" alt="Original photo"><figcaption>Your original photo</figcaption></figure>
+    <figure class="t"><div class="ph"><img src="/images/portrait.jpg" alt="Photo with the portfolio treatment"></div><figcaption>Treated for the site (live in About)</figcaption></figure>
+    <div class="txt">
+      <h3>What I did, and why</h3>
+      <p>Your face is <b>100% your real photo</b>. Nothing is generated. I printed it in "ink": black-and-white with a little extra contrast, blended into the paper. The white studio background disappears into the page, so it stops looking like an ID photo and starts looking like a plate in a printed book. Orange corner marks frame it like a drawing. When a visitor hovers over it, a little colour comes back.</p>
+      <p style="margin-top:14px"><b>Why black-and-white?</b> Your blue checked shirt fights the paper-and-ink colours. In grayscale it reads as a subtle texture instead.</p>
+      <p style="margin-top:14px"><b>Next step (optional): an art-directed portrait.</b> For a charcoal or graphite shirt and natural side light, we need an AI image tool that keeps your face. I can do this with the image generator connected to this app, but it means uploading your photo to that third-party service, so I'll only do it if you say yes. The best option of all is a 10-minute photo with any phone: a charcoal/grey/black plain shirt, standing next to a window (side light), in front of a plain light wall. That always looks more real than AI.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 6 ============ -->
+<section class="phase wrap" id="p6">
+  <div class="ph-head"><p class="mono">Phase 06</p><h2>Review: <span class="serif">originality, usability, consistency.</span></h2></div>
+  <ul class="checks">
+    <li><span class="tag y">Pass</span><div><b>Original, not a template.</b> No standard dark hero or grid of identical cards. Projects are shown as "drawing sheets", expertise as a schedule, and experience as a drawn timeline. Each section has its own layout.</div></li>
+    <li><span class="tag y">Pass</span><div><b>Navigation.</b> Five links, one "Let's Talk" button and a scroll progress line. On phones it's one Menu button that opens a full-screen sheet. Nothing hidden or clever.</div></li>
+    <li><span class="tag y">Pass</span><div><b>Speed.</b> Three.js loads only after your name and intro text are visible, and the 3D pauses when it's off-screen. The Experiments 3D only loads when you scroll near it.</div></li>
+    <li><span class="tag y">Pass</span><div><b>Accessibility.</b> Real text (not images), readable contrast, keyboard focus outlines, a skip link, and support for reduce-motion.</div></li>
+    <li><span class="tag p">Fix</span><div><b>Your title doesn't match your resume.</b> The site says "Creative Web Developer & Interactive Experience Developer". Your resume says "Software Developer, React & PHP". A recruiter who reads both will notice. I recommend <b>"Creative Web Developer · React & Laravel"</b>. It keeps the creative positioning and adds the skills they search for.</div></li>
+    <li><span class="tag p">Fix</span><div><b>Expertise and Skills talk about Framer/Shopify.</b> Your real work is React, Laravel, REST APIs, ERP/CRM, WordPress and Webflow. I'll rewrite both sections from your resume: honest, and much stronger for hiring.</div></li>
+    <li><span class="tag p">Fix</span><div><b>Hero labels use architect words</b> ("Skin", "Fit-out"). I'll change them to HTML · CSS · JavaScript · CMS, as shown in Phase 02.</div></li>
+    <li><span class="tag">Later</span><div><b>Projects.</b> Left exactly as they are, as you asked. When you send new projects, each one becomes a drawing sheet: screenshot, problem → solution, stack, and live/code links.</div></li>
+    <li><span class="tag">Hidden</span><div><b>Testimonials.</b> This section stays hidden until you have real quotes. Fake quotes hurt trust more than having none.</div></li>
+  </ul>
+</section>
+
+<!-- ============ PHASE 7 ============ -->
+<section class="phase rec" id="p7">
+  <div class="wrap">
+    <div class="ph-head"><p class="mono">Phase 07</p><h2>My recommendation. <span class="serif">Approve and I build.</span></h2></div>
+    <div class="cols" style="margin-bottom:36px">
+      <div class="card"><h3>Keep</h3><p>The Drawing Set: paper, ink, survey orange, Archivo + Instrument Serif, the drawn timeline, the project sheets, and the 3D layers idea.</p></div>
+      <div class="card"><h3>Improve</h3><p>The 3D hero becomes "From blueprint to browser". Your title and the Expertise and Skills sections will match your real experience. Your portrait is already in.</p></div>
+      <div class="card"><h3>Don't touch</h3><p>Projects stay as they are until you send new ones.</p></div>
+    </div>
+    <h3>Phase 08: what I'll build after you approve (React + Three.js + R3F + GSAP)</h3>
+    <ol>
+      <li>Rebuild the hero 3D: page-shaped floors, real content on each layer, a browser frame that lands on top on scroll, and a "Live" stamp at the end. Static drawing fallback for old phones.</li>
+      <li>Rename the floor labels to HTML · CSS · JavaScript · CMS, with a short code snippet shown when you hover a layer.</li>
+      <li>Update the title, the hero intro, Expertise and Skills from your resume.</li>
+      <li>Test on desktop, tablet and phone, plus reduce-motion and a speed check, then send you screenshots.</li>
+    </ol>
+  </div>
+</section>
+
+<script>
+/* ---------- Storyboard: isometric drawings generated in code ---------- */
+const ISO = (x, y, z) => [(x - y) * 0.866, (x + y) * 0.5 - z];
+const P = (pts) => pts.map(p => ISO(...p).map(n => n.toFixed(1)).join(',')).join(' ');
+const W = 150, D = 100; // page width/depth in "drawing units"
+const LAYERS = [
+  { k: 'HTML', s: 'Structure' }, { k: 'CSS', s: 'Style' },
+  { k: 'JavaScript', s: 'Behaviour' }, { k: 'CMS', s: 'Content' }
+];
+function plate(z, i, opts = {}) {
+  const lift = opts.lift || 0; z += lift;
+  const hl = opts.hl;
+  const stroke = hl ? '#FF4F1A' : '#16181D';
+  let g = `<polygon points="${P([[0,0,z],[W,0,z],[W,D,z],[0,D,z]])}" fill="${hl ? '#FFF3EC' : '#F4F0E7'}" stroke="${stroke}" stroke-width="${hl ? 1.6 : 1}"/>`;
+  const r = (x, y, w, d, a = '') => `<polygon points="${P([[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z]])}" ${a}/>`;
+  if (i === 0) { // HTML wireframe boxes
+    g += r(8,8,134,12,'fill="none" stroke="#5C6068" stroke-dasharray="3 2"');
+    g += r(8,26,84,40,'fill="none" stroke="#5C6068" stroke-dasharray="3 2"');
+    g += r(98,26,44,40,'fill="none" stroke="#5C6068" stroke-dasharray="3 2"');
+    g += r(8,72,134,20,'fill="none" stroke="#5C6068" stroke-dasharray="3 2"');
+  } else if (i === 1) { // CSS colour + type
+    g += r(8,8,134,12,'fill="#16181D"');
+    g += r(8,26,84,40,'fill="#E2DCCF" stroke="#16181D" stroke-width=".6"');
+    g += r(98,26,20,20,'fill="#FF4F1A"'); g += r(122,26,20,20,'fill="#1B2A4A"');
+    for (let k = 0; k < 3; k++) g += r(8, 74 + k*6, 110 - k*25, 2.5, 'fill="#5C6068"');
+  } else if (i === 2) { // JS: toggle, cursor, motion arcs
+    g += r(14,14,30,12,'fill="none" stroke="#16181D"'); g += r(32,16,10,8,'fill="#FF4F1A"');
+    const [cx, cy] = ISO(95, 55, z);
+    g += `<path d="M${cx},${cy} l0,12 l3.5,-3.5 l4,6 l2,-1.2 l-4,-5.5 l5,-.5 z" fill="#16181D"/>`;
+    const [ax, ay] = ISO(30, 60, z), [bx, by] = ISO(120, 25, z);
+    g += `<path d="M${ax},${ay} Q${(ax+bx)/2},${Math.min(ay,by)-25} ${bx},${by}" fill="none" stroke="#FF4F1A" stroke-dasharray="4 3"/>`;
+  } else { // CMS content blocks
+    for (let k = 0; k < 4; k++) { g += r(8, 10 + k*21, 30, 15, 'fill="#E2DCCF" stroke="#16181D" stroke-width=".6"'); g += r(44, 12 + k*21, 90 - k*12, 3, 'fill="#16181D"'); g += r(44, 19 + k*21, 70, 2, 'fill="#5C6068"'); }
+  }
+  return g;
+}
+function label(z, i, x0, y0, on, lift = 0) {
+  const [x, y] = ISO(W, 0, z + lift);
+  const c = on ? '#B8360B' : '#16181D';
+  return `<line x1="${x}" y1="${y}" x2="${x + 34}" y2="${y}" stroke="${c}" stroke-width=".8"/>` +
+    `<text x="${x + 38}" y="${y - 2}" font-family="Archivo" font-weight="700" font-size="11" fill="${c}">0${i+1} ${LAYERS[i].k}</text>` +
+    `<text x="${x + 38}" y="${y + 11}" font-family="Instrument Serif" font-style="italic" font-size="12" fill="#5C6068">${LAYERS[i].s}</text>`;
+}
+function scene(gap, opts = {}) {
+  let s = '';
+  for (let i = 0; i < 4; i++) {
+    const lift = opts.hover === i ? 18 : 0;
+    s += plate(i * gap, i, { hl: opts.hover === i, lift });
+    if (opts.labels) s += label(i * gap, i, 0, 0, opts.hover === i, lift);
+  }
+  return s;
+}
+function browser(z) {
+  const top = [[0,0,z],[W,0,z],[W,16,z],[0,16,z]];
+  let s = `<polygon points="${P(top)}" fill="#16181D"/>`;
+  [6,12,18].forEach((x, k) => { const [cx, cy] = ISO(x, 8, z); s += `<ellipse cx="${cx}" cy="${cy}" rx="2.4" ry="1.4" fill="${k===0?'#FF4F1A':'#ECE7DC'}"/>`; });
+  s += `<polygon points="${P([[30,4,z],[120,4,z],[120,12,z],[30,12,z]])}" fill="#ECE7DC"/>`;
+  s += `<polygon points="${P([[0,16,z],[W,16,z],[W,D,z],[0,D,z]])}" fill="#F4F0E7" stroke="#16181D"/>`;
+  s += `<polygon points="${P([[10,24,z],[100,24,z],[100,34,z],[10,34,z]])}" fill="#16181D"/>`;
+  s += `<polygon points="${P([[10,40,z],[70,40,z],[70,44,z],[10,44,z]])}" fill="#5C6068"/>`;
+  s += `<polygon points="${P([[10,52,z],[40,52,z],[40,60,z],[10,60,z]])}" fill="#FF4F1A"/>`;
+  s += `<polygon points="${P([[80,40,z],[140,40,z],[140,90,z],[80,90,z]])}" fill="#E2DCCF" stroke="#16181D" stroke-width=".6"/>`;
+  return s;
+}
+function svg(inner, vb = '-110 -230 360 330') {
+  return `<svg viewBox="${vb}" role="img"><defs><pattern id="gr" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="rgba(22,24,29,.06)"/></pattern></defs><rect x="-110" y="-230" width="360" height="330" fill="url(#gr)"/>${inner}</svg>`;
+}
+const frames = [
+  { t: 'Load: the exploded drawing', d: 'Your name rises up. Four page-shaped layers float apart like a technical drawing, each labelled in plain words.', s: svg(scene(42, { labels: true })) },
+  { t: 'Hover: a layer explains itself', d: 'Hover (or tap) a layer. It lifts, turns orange, and shows a tiny code snippet from that layer.', s: svg(scene(42, { labels: true, hover: 1 }) + `<g transform="translate(-100,-215)"><rect width="120" height="36" fill="#16181D"/><text x="8" y="15" font-family="JetBrains Mono" font-size="9" fill="#FF4F1A">.hero {</text><text x="8" y="28" font-family="JetBrains Mono" font-size="9" fill="#ECE7DC">  color: var(--ink); }</text></g>`) },
+  { t: 'Scroll: the layers assemble', d: 'As you scroll, the gaps close. Structure, style, behaviour and content stack into one page.', s: svg(scene(12)) },
+  { t: 'End: the website goes live', d: 'A browser frame lands on top showing a finished page, with a "LIVE" stamp. Blueprint → browser.', s: svg(scene(4) + browser(16) + `<g transform="translate(120,-150) rotate(-8)"><rect x="-4" y="-16" width="70" height="26" fill="none" stroke="#FF4F1A" stroke-width="2"/><text x="31" y="2" text-anchor="middle" font-family="Archivo" font-weight="800" font-size="14" fill="#FF4F1A" letter-spacing="2">● LIVE</text></g>`) },
+];
+document.getElementById('story').innerHTML = frames.map((f, i) =>
+  `<figure class="frame"><span class="num mono">Frame 0${i+1}</span>${f.s}<figcaption><b>${f.t}</b>${f.d}</figcaption></figure>`).join('');
+
+/* ---------- Live section viewer ---------- */
+const SECTIONS = [
+  { id: 'home', n: 'Hero', why: [['Layout', 'Your name fills the full width at the bottom, like the title on a drawing. The 3D sits above it and the intro sits on the left. You see who you are first, then what you do.'], ['Phone', 'The 3D gets smaller and moves above the text. Your name splits onto two lines so it stays huge. Buttons are full-width and easy to tap.']] },
+  { id: 'nav', n: 'Navigation', why: [['Desktop', 'Your name on the left, five links in the centre, and one dark "Let\'s Talk" button on the right. A small orange diamond marks the section you\'re in, and an orange line under the bar shows scroll progress.'], ['Phone', 'One "Menu" button with a text label (clearer than just an icon). It opens a full-screen paper sheet with big links.']] },
+  { id: 'about', n: 'About', why: [['Layout', 'Two columns like a magazine spread: your portrait on the left, story on the right. A big serif quote breaks up the text so it isn\'t a wall of paragraphs.'], ['Portrait', 'Printed in ink on paper with orange corner marks and tape. Hover it and some colour returns.']] },
+  { id: 'expertise', n: 'Expertise', why: [['Layout', 'Shown as a "schedule" (a numbered table, like on architectural drawings) instead of the usual grid of icon cards. It\'s easy to scan and it\'s different.'], ['To update', 'Content will be rewritten from your resume (React, Laravel, REST APIs, ERP/CRM, WordPress, Webflow). The design stays.']] },
+  { id: 'work', n: 'Projects', why: [['Layout', 'Each project is a full "drawing sheet" with a big preview, a title block and the stack. Not repeated small cards.'], ['Untouched', 'Left as it is, as you asked. Your new projects will slot in here.']] },
+  { id: 'skills', n: 'Skills', why: [['Layout', 'Skills grouped by layer of a website (frontend, backend, CMS…), each tagged Practised / Familiar / Learning. It\'s honest, and recruiters trust that more than skill bars.'], ['To update', 'Add Laravel, MySQL/MSSQL/MongoDB, Webflow, Git, Postman and AWS S3 from your resume.']] },
+  { id: 'journey', n: 'Experience', why: [['Layout', 'A timeline line that draws itself as you scroll, with dots for each role. Newest first.'], ['Content', 'Already updated from your resume: The Go-To Guy!, Bigapple Lifestyle, MCA and B.Sc.']] },
+  { id: 'experiments', n: 'Experiments', why: [['Layout', 'The only dark (blueprint navy) section. This change of colour tells visitors "this is the playground": small live demos of 3D and scroll animation.'], ['Purpose', 'Shows your creative skills without cluttering the main projects.']] },
+  { id: 'contact', n: 'Contact', why: [['Layout', 'Your email in very large type (one click to mail you), with a short form next to it. Project-type chips make filling it in quick.'], ['Phone', 'The form stacks under the email, inputs are full-width, and your phone number is tap-to-call.']] },
+  { id: 'footer', n: 'Footer', why: [['Layout', '"Designed & built by" in large serif as a signature, then links and a back-to-top button whose circle fills as you scroll down the page.'], ['Why', 'It ends the page with personality instead of a plain copyright line.']] },
+];
+const tabs = document.getElementById('tabs'), why = document.getElementById('why');
+const fDesk = document.getElementById('fDesk'), fPhone = document.getElementById('fPhone');
+let current = 'home';
+function fit() {
+  const sd = document.querySelector('#dDesk .screen'), sp = document.querySelector('#dPhone .screen');
+  const kd = sd.clientWidth / 1440, kp = sp.clientWidth / 390;
+  fDesk.style.transform = `scale(${kd})`; sd.style.height = 900 * kd + 'px';
+  fPhone.style.transform = `scale(${kp})`; sp.style.height = 780 * kp + 'px';
+}
+function go(frame, id) {
+  try {
+    const w = frame.contentWindow, d = frame.contentDocument;
+    if (!d || !d.body) return;
+    const sheetOpen = d.querySelector('.menu-btn.close');
+    if (id !== 'nav' && sheetOpen && sheetOpen.tabIndex === 0) sheetOpen.click();
+    if (id === 'home' || id === 'nav') { w.scrollTo({ top: 0, behavior: 'instant' }); }
+    else {
+      const el = id === 'footer' ? d.querySelector('footer') : d.getElementById(id);
+      if (el) w.scrollTo({ top: el.getBoundingClientRect().top + w.scrollY - (id === 'footer' ? 0 : 60), behavior: 'instant' });
+    }
+    if (id === 'nav' && frame === fPhone) setTimeout(() => d.querySelector('.menu-btn')?.click(), 300);
+  } catch (e) { /* cross-origin: ignore */ }
+}
+function select(id) {
+  current = id;
+  [...tabs.children].forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id));
+  const s = SECTIONS.find(x => x.id === id);
+  why.innerHTML = s.why.map(([h, p], i) => `<div class="card"><h3><span class="mono">${String(SECTIONS.indexOf(s) + 1).padStart(2, '0')}.${i + 1}</span>${h}</h3><p>${p}</p></div>`).join('');
+  go(fDesk, id); go(fPhone, id);
+}
+SECTIONS.forEach(s => {
+  const b = document.createElement('button'); b.type = 'button'; b.dataset.id = s.id; b.textContent = s.n;
+  b.onclick = () => select(s.id); tabs.appendChild(b);
+});
+[fDesk, fPhone].forEach(f => f.addEventListener('load', () => setTimeout(() => go(f, current), 1200)));
+addEventListener('resize', fit); fit(); select('home');
+</script>
+</body>
+</html>

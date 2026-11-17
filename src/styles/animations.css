@@ -1,0 +1,21 @@
+/* =========================================================
+   CSS ANIMATIONS (small loops). GSAP handles everything else.
+   ========================================================= */
+@keyframes ping {
+  0% { box-shadow: 0 0 0 0 rgba(255, 79, 26, 0.5); }
+  70% { box-shadow: 0 0 0 9px rgba(255, 79, 26, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 79, 26, 0); }
+}
+@keyframes cue { to { top: 100%; } }
+
+/* Line icons draw themselves when their row/card is hovered */
+.draw * { stroke-dasharray: 160; stroke-dashoffset: 0; transition: stroke-dashoffset 1.2s var(--ease); }
+.srow-btn:hover + * .draw *, .srow:hover .draw * { animation: draw 1.2s var(--ease); }
+@keyframes draw { from { stroke-dashoffset: 160; } to { stroke-dashoffset: 0; } }
+
+/* Respect "reduce motion": stop loops and long transitions */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+  .mock { transform: none !important; }
+}
